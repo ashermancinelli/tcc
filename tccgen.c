@@ -5028,6 +5028,38 @@ static void sym_to_attr(AttributeDef *ad, Sym *s)
     merge_funcattr(&ad->f, &s->f);
 }
 
+/* Create a symbol with the name of the alias source, set asm label to the
+ * alias target. Return the alias's symbol. */
+static Sym* parse_transparent_alias_decl(AttributeDef *ad, CType *t)
+{
+  int target;
+  int alias = tok;
+  Sym *target_sym;
+
+  if (alias < TOK_UIDENT)
+    expect("identifier");
+
+  printf("Got alias '%s'", get_tok_str(alias, NULL));
+
+  next();
+  skip('=');
+
+  target = tok;
+
+  printf("Got alias target '%s'", get_tok_str(target, NULL));
+
+  target_sym = sym_find(target);
+  *t = target_sym->type;
+  const char* target_str = get_tok_str(target, NULL);
+
+  if (!target_sym) {
+    tcc_error("alias target '%s' is undefined", target_str);
+  }
+
+  ad->alias_target = target;
+  return sym_find(alias);
+}
+
 /* Add type qualifiers to a type. If the type is an array then the qualifiers
    are added to the element type, copied because it could be a typedef. */
 static void parse_btype_qualify(CType *type, int qualifiers)
@@ -5172,6 +5204,14 @@ static int parse_btype(CType *type, AttributeDef *ad)
                 goto basic_type2;
             }
             break;
+
+        case TOK__Alias:
+            next();
+            tcc_warning("_Alias is a non-standard extension");
+            s = parse_transparent_alias_decl(ad, type);
+            // sym_to_attr(ad, s);
+            return 1;
+
         case TOK_CONST1:
         case TOK_CONST2:
         case TOK_CONST3:
@@ -6261,7 +6301,6 @@ ST_FUNC void unary(void)
         vpushsym(&s->type, s);
         next();
         break;
-
     case TOK_GENERIC:
     {
 	CType controlling_type;
