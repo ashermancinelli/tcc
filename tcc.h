@@ -1045,7 +1045,12 @@ struct filespec {
 #define VT_STATIC  0x00002000  /* static variable */
 #define VT_TYPEDEF 0x00004000  /* typedef definition */
 #define VT_INLINE  0x00008000  /* inline definition */
-/* currently unused: 0x000[1248]0000  */
+
+/* shouldn't really be under 'storage', ah well. That's what we get for adding
+ * non-C99 to TCC... */
+#define VT_ALIAS   0x00010000
+
+/* currently unused: 0x000[248]0000  */
 
 #define VT_STRUCT_SHIFT 20     /* shift for bitfield shift values (32 - 2*6) */
 #define VT_STRUCT_MASK (((1U << (6+6)) - 1) << VT_STRUCT_SHIFT | VT_BITFIELD)

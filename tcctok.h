@@ -19,6 +19,7 @@
      DEF(TOK_CASE, "case")
 
      DEF(TOK__Atomic, "_Atomic")
+     DEF(TOK__Alias, "_Alias") /* Transparent symbol alias */
      DEF(TOK_CONST1, "const")
      DEF(TOK_CONST2, "__const") /* gcc keyword */
      DEF(TOK_CONST3, "__const__") /* gcc keyword */
